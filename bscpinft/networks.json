@@ -1,0 +1,8 @@
+{
+  "chapel": {
+    "ERC1967Proxy": {
+      "address": "0xb92000f91a80144D03CBd8931095683B7F76405E",
+      "startBlock": 0
+    }
+  }
+}

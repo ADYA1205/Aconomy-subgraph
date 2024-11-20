@@ -1,0 +1,5 @@
+[profile.default]
+src = 'contracts'
+test = 'foundry-test'
+out = 'artifacts/contracts'
+libs = ['lib']
