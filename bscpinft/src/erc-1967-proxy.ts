@@ -1,13 +1,13 @@
 import {
   AdminChanged as AdminChangedEvent,
   BeaconUpgraded as BeaconUpgradedEvent,
-  Upgraded as UpgradedEvent,
+  Upgraded as UpgradedEvent
 } from "../generated/ERC1967Proxy/ERC1967Proxy"
 import { AdminChanged, BeaconUpgraded, Upgraded } from "../generated/schema"
 
 export function handleAdminChanged(event: AdminChangedEvent): void {
   let entity = new AdminChanged(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.previousAdmin = event.params.previousAdmin
   entity.newAdmin = event.params.newAdmin
@@ -21,7 +21,7 @@ export function handleAdminChanged(event: AdminChangedEvent): void {
 
 export function handleBeaconUpgraded(event: BeaconUpgradedEvent): void {
   let entity = new BeaconUpgraded(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.beacon = event.params.beacon
 
@@ -34,7 +34,7 @@ export function handleBeaconUpgraded(event: BeaconUpgradedEvent): void {
 
 export function handleUpgraded(event: UpgradedEvent): void {
   let entity = new Upgraded(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.implementation = event.params.implementation
 

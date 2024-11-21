@@ -30,29 +30,3 @@ dataSources:
         - event: Upgraded(indexed address)
           handler: handleUpgraded
       file: ./src/erc-1967-proxy.ts
-  - kind: ethereum
-    name: ERC1967Proxy
-    network: chapel
-    source:
-      address: "0xe8B5338739EA8358D6cC0F322eC390CD57259BbD"
-      abi: ERC1967Proxy
-      startBlock: 0
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - ERC1967ProxyAdminChanged
-        - ERC1967ProxyBeaconUpgraded
-        - ERC1967ProxyUpgraded
-      abis:
-        - name: ERC1967Proxy
-          file: ./abis/ERC1967Proxy.json
-      eventHandlers:
-        - event: AdminChanged(address,address)
-          handler: handleAdminChanged
-        - event: BeaconUpgraded(indexed address)
-          handler: handleBeaconUpgraded
-        - event: Upgraded(indexed address)
-          handler: handleUpgraded
-      file: ./src/erc-1967-proxy.ts

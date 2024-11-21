@@ -1,7 +1,8 @@
 {
   "chapel": {
     "ERC1967Proxy": {
-      "address": "0xe8B5338739EA8358D6cC0F322eC390CD57259BbD"
+      "address": "0xb92000f91a80144D03CBd8931095683B7F76405E",
+      "startBlock": 0
     }
   }
 }
