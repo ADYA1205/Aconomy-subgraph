@@ -4,29 +4,343 @@ indexerHints:
 schema:
   file: ./schema.graphql
 dataSources:
-  - kind: ethereum
-    name: ERC1967Proxy
+  - kind: ethereum/contract
+    name: piNFT
     network: chapel
     source:
       address: "0xb92000f91a80144D03CBd8931095683B7F76405E"
-      abi: ERC1967Proxy
+      abi: piNFT
       startBlock: 0
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.7
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - AdminChanged
-        - BeaconUpgraded
-        - Upgraded
+        - Token
+        - Royalties
       abis:
-        - name: ERC1967Proxy
-          file: ./abis/ERC1967Proxy.json
+        - name: piNFT
+          file: ./abis/piNFT.json
       eventHandlers:
-        - event: AdminChanged(address,address)
-          handler: handleAdminChanged
-        - event: BeaconUpgraded(indexed address)
-          handler: handleBeaconUpgraded
-        - event: Upgraded(indexed address)
-          handler: handleUpgraded
-      file: ./src/erc-1967-proxy.ts
+        - event: TokenMinted(uint256,address)
+          handler: handleTokenMinted
+        - event: RoyaltiesSetForTokenId(indexed uint256,(address,uint96)[])
+          handler: handleRoyaltiesSetForTokenId
+      file: ./src/piNFT.ts
+
+  - kind: ethereum/contract
+    name: piNFTMethods
+    network: chapel
+    source:
+      address: "0xe8B5338739EA8358D6cC0F322eC390CD57259BbD"
+      abi: piNFTMethods
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - ERC20Event
+        - ValidatorEvent
+        - Commission
+        - ValidatorFundsWithdrawn
+      abis:
+        - name: piNFTMethods
+          file: ./abis/piNFTMethods.json
+      eventHandlers:
+        - event: ERC20Added(address,indexed address,indexed uint256,indexed address,uint256)
+          handler: handleERC20Added
+        - event: ERC20Transferred(address,indexed uint256,indexed address,indexed address,uint256)
+          handler: handleERC20Transferred
+        - event: ValidatorFundsWithdrawn(address,address,uint256,address,uint256)
+          handler: handleValidatorFundsWithdrawn
+        - event: ValidatorAdded(address,uint256,address)
+          handler: handleValidatorAdded
+      file: ./src/piNFTMethods.ts
+
+  - kind: ethereum/contract
+    name: AconomyFee
+    network: chapel
+    source:
+      address: "0x68a99c3e90cf4CcBC933dAaE4F303cfC05291871"
+      abi: AconomyFee
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - OwnershipTransferred
+        - SetAconomyNFTLendBorrowFee
+        - SetAconomyPiMarketFee
+        - SetAconomyPoolFee
+      abis:
+        - name: AconomyFee
+          file: ./abis/AconomyFee.json
+      eventHandlers:
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: SetAconomyNFTLendBorrowFee(uint16,uint16)
+          handler: handleSetAconomyNFTLendBorrowFee
+        - event: SetAconomyPiMarketFee(uint16,uint16)
+          handler: handleSetAconomyPiMarketFee
+        - event: SetAconomyPoolFee(uint16,uint16)
+          handler: handleSetAconomyPoolFee
+      file: ./src/aconomyfee.ts
+
+  - kind: ethereum/contract
+    name: piMarket
+    network: chapel
+    source:
+      address: "0x1A28451ff140Cf1224706839AF44b8de4EB3f019"
+      abi: piMarket
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Sale
+        - BidOrder
+        - Swap
+      abis:
+        - name: piMarket
+          file: ./abis/piMarket.json
+      eventHandlers:
+        - event: SaleCreated(uint256,address,uint256)
+          handler: handleSaleCreated
+        - event: NFTBought(uint256,address)
+          handler: handleNFTBought
+        - event: SaleCancelled(uint256)
+          handler: handleSaleCancelled
+        - event: BidCreated(uint256,uint256)
+          handler: handleBidCreated
+        - event: BidExecuted(uint256,uint256,uint256)
+          handler: handleBidExecuted
+        - event: BidWithdrawn(uint256,uint256)
+          handler: handleBidWithdrawn
+        - event: SwapCancelled(uint256)
+          handler: handleSwapCancelled
+        - event: SwapAccepted(uint256)
+          handler: handleSwapAccepted
+        - event: SwapProposed(indexed address,indexed address,indexed uint256)
+          handler: handleSwapProposed
+        - event: updatedSalePrice(uint256,uint256)
+          handler: handleUpdatedSalePrice
+      file: ./src/piMarket.ts
+
+  # - kind: ethereum/contract
+  #   name: NFTlendingBorrowing
+  #   network: chapel # Binance Smart Chain Testnet
+  #   source:
+  #     address: "0x5bB81157Eb2b27844d6D6fF69AbbB9eda4eF2CdD"
+  #     abi: NFTlendingBorrowing
+  #     startBlock: 0
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.6
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - NFTDetail
+  #       - BidDetail
+  #     abis:
+  #       - name: NFTlendingBorrowing
+  #         file: ./abis/NFTlendingBorrowing.json
+  #     eventHandlers:
+  #       - event: AppliedBid(uint256,uint256,uint256,address,uint256,uint16,uint32,uint256,address)
+  #         handler: handleAppliedBid
+  #       - event: NFTlisted(uint256,uint256,address,uint256,uint16,uint32,uint256)
+  #         handler: handleNFTlisted
+  #       - event: PercentSet(uint256,uint16)
+  #         handler: handlePercentSet
+  #       - event: DurationSet(uint256,uint32)
+  #         handler: handleDurationSet
+  #       - event: ExpectedAmountSet(uint256,uint256)
+  #         handler: handleExpectedAmountSet
+  #       - event: AcceptedBid(uint256,uint256,uint256,uint256,address)
+  #         handler: handleAcceptedBid
+  #       - event: BidRejected(uint256,uint256,address,uint256,address)
+  #         handler: handleBidRejected
+  #       - event: repaid(uint256,uint256,uint256,address)
+  #         handler: handleRepaid
+  #       - event: Withdrawn(uint256,uint256,uint256)
+  #         handler: handleWithdrawn
+  #       - event: NFTRemoved(uint256,address)
+  #         handler: handleNFTRemoved
+  #     file: ./src/NFTlendingBorrowing.ts
+   
+  - kind: ethereum/contract
+    name: poolRegistry
+    network: chapel
+    source:
+      address: "0x05736Ca024Db6D7300E7c757558300aEC14A0Bb6"
+      abi: poolRegistry
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - PoolDetail
+        - PoolCreated
+        - SetPaymentCycleDuration
+        - SetPaymentDefaultDuration
+        - SetPoolFee
+        - SetLoanExpirationTime
+        - SetPoolURI
+        - SetAPR
+        - PoolClosed
+      abis:
+        - name: poolRegistry
+          file: ./abis/poolRegistry.json
+      eventHandlers:
+      - event: poolCreated(indexed address,address,uint256)
+        handler: handlePoolCreated
+      - event: SetPaymentCycleDuration(uint256,uint32)
+        handler: handleSetPaymentCycleDuration
+      - event: SetPaymentDefaultDuration(uint256,uint32)
+        handler: handleSetPaymentDefaultDuration
+      - event: SetPoolFee(uint256,uint16)
+        handler: handleSetPoolFee
+      - event: SetloanExpirationTime(uint256,uint32)
+        handler: handleSetLoanExpirationTime
+      - event: SetPoolURI(uint256,string)
+        handler: handleSetPoolURI
+      - event: SetAPR(uint256,uint16)
+        handler: handleSetAPR
+      - event: poolClosed(uint256)
+        handler: handlePoolClosed
+      file: ./src/poolRegistry.ts
+
+  - kind: ethereum/contract
+    name: FundingPool
+    network: chapel
+    source:
+      address: "0x22F3191B4C58ed6E327baebe833dE79B3C8E9f2b"
+      abi: FundingPool
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - SuppliedToPool
+        - BidAccepted
+        - BidRejected
+        - BidRepaid
+        - InstallmentRepaid
+        - FullAmountRepaid
+        - Withdrawn
+      abis:
+        - name: FundingPool
+          file: ./abis/FundingPool.json
+      eventHandlers:
+      - event: SuppliedToPool(indexed address,indexed uint256,uint256,indexed address,uint256)
+        handler: handleSuppliedToPool
+      - event: BidAccepted(address,address,uint256,uint256,uint256,uint256)
+        handler: handleBidAccepted
+      - event: BidRejected(address,uint256,uint256,uint256)
+        handler: handleBidRejected
+      - event: BidRepaid(indexed uint256,uint256)
+        handler: handleBidRepaid
+      - event: InstallmentRepaid(uint256,uint256,uint256,uint256,uint256)
+        handler: handleInstallmentRepaid
+      - event: FullAmountRepaid(uint256,uint256,uint256,uint256)
+        handler: handleFullAmountRepaid
+      - event: Withdrawn(address,uint256,uint256,uint256)
+        handler: handleWithdrawn
+      file: ./src/FundingPool.ts
+  - kind: ethereum/contract
+    name: poolAddress
+    network: chapel
+    source:
+      address: "0xD012B8ABb439F8405Dad4E5AE61c185FF1270B64"
+      abi: poolAddress
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Loan
+        - BorrowerLoan
+      abis:
+        - name: poolAddress
+          file: ./abis/poolAddress.json
+      eventHandlers:
+      - event: loanAccepted(indexed uint256,indexed address)
+        handler: handleLoanAccepted
+      - event: repaidAmounts(uint256,uint256,uint256)
+        handler: handleRepaidAmounts
+      - event: LoanRepaid(indexed uint256,uint256)
+        handler: handleLoanRepaid
+      - event: LoanRepayment(indexed uint256,uint256)
+        handler: handleLoanRepayment
+      - event: SubmittedLoan(indexed uint256,indexed address,address,uint256)
+        handler: handleSubmittedLoan
+      file: ./src/poolAddress.ts
+  - kind: ethereum/contract
+    name: validatedNFT
+    network: chapel
+    source:
+      address: "0xA9eb3C4160C8963a02C29ca7CDEE4359C9c659c9"
+      abi: validatedNFT
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - ValidatedNFTToken
+        - ValidatorRoyalties
+      abis:
+        - name: validatedNFT
+          file: ./abis/validatedNFT.json
+      eventHandlers:
+        - event: TokenMinted(uint256,address)
+          handler: handleTokenMinted
+        - event: RoyaltiesSetForValidator(indexed uint256,(address,uint96)[])
+          handler: handleRoyaltiesSetForValidator
+      file: ./src/validatedNFT.ts
+
+  - kind: ethereum/contract
+    name: NFTlendingBorrowing
+    network: chapel
+    source:
+      address: "0x5bB81157Eb2b27844d6D6fF69AbbB9eda4eF2CdD" # Proxy Contract Address
+      abi: NFTlendingBorrowing
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - NFTDetail
+        - BidDetail
+        - AppliedBid
+        - RepaidEvent
+        - AcceptedBidEvent
+        - WithdrawnEvent
+        - BidRejectedEvent
+        - DurationSetEvent
+        - PercentSetEvent
+        - NFTRemovedEvent
+      abis:
+        - name: NFTlendingBorrowing
+          file: ./abis/NFTlendingBorrowing.json
+      eventHandlers:
+        - event: NFTlisted(uint256,uint256,address,uint256,uint16,uint32,uint256)
+          handler: handleNFTListed
+        - event: AppliedBid(uint256,uint256,uint256,address,uint256,uint16,uint32,uint256,address)
+          handler: handleAppliedBid
+        - event: AcceptedBid(uint256,uint256,uint256,uint256,address)
+          handler: handleAcceptedBid
+        - event: repaid(uint256,uint256,uint256,address)
+          handler: handleRepaid
+        - event: Withdrawn(uint256,uint256,uint256)
+          handler: handleWithdrawn
+        - event: BidRejected(uint256,uint256,address,uint256,address)
+          handler: handleBidRejected
+        - event: NFTRemoved(uint256,address)
+          handler: handleNFTRemoved
+      file: ./src/NFTlendingBorrowing.ts

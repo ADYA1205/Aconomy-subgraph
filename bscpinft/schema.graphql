@@ -1,24 +1,387 @@
-type AdminChanged @entity(immutable: true) {
+type Token @entity {
+  id: ID!
+  owner: Bytes!
+  uri: String!
+  royalties: [Royalties!] @derivedFrom(field: "token")
+}
+
+type Royalties @entity {
+  id: ID!
+  token: Token!
+  account: Bytes!
+  value: BigInt!
+}
+type ERC20Event @entity {
+  id: ID!
+  collectionAddress: Bytes!
+  from: Bytes!
+  tokenId: BigInt!
+  erc20Contract: Bytes!
+  value: BigInt!
+}
+
+type ValidatorEvent @entity {
+  id: ID!
+  collectionAddress: Bytes!
+  tokenId: BigInt!
+  validator: Bytes!
+}
+
+type Commission @entity {
+  id: ID!
+  collectionAddress: Bytes!
+  tokenId: BigInt!
+  commissionValue: BigInt!
+  isValid: Boolean!
+}
+
+type ValidatorFundsWithdrawn @entity {
+  id: ID!
+  collectionAddress: Bytes!
+  withdrawer: Bytes!
+  tokenId: BigInt!
+  erc20Contract: Bytes!
+  amount: BigInt!
+}
+type OwnershipTransferred @entity(immutable: true) {
   id: Bytes!
-  previousAdmin: Bytes! # address
-  newAdmin: Bytes! # address
+  previousOwner: Bytes! # address
+  newOwner: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type BeaconUpgraded @entity(immutable: true) {
+type SetAconomyNFTLendBorrowFee @entity(immutable: true) {
   id: Bytes!
-  beacon: Bytes! # address
+  newFee: Int! # uint16
+  oldFee: Int! # uint16
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type Upgraded @entity(immutable: true) {
+type SetAconomyPiMarketFee @entity(immutable: true) {
   id: Bytes!
-  implementation: Bytes! # address
+  newFee: Int! # uint16
+  oldFee: Int! # uint16
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+type SetAconomyPoolFee @entity(immutable: true) {
+  id: Bytes!
+  newFee: Int! # uint16
+  oldFee: Int! # uint16
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Sale @entity {
+  id: ID!
+  saleId: BigInt!
+  tokenId: BigInt!
+  tokenContract: Bytes!
+  price: BigInt!
+  directSale: Boolean!
+  bidSale: Boolean!
+  status: Boolean!
+  bidStartTime: BigInt
+  bidEndTime: BigInt
+  currentOwner: Bytes!
+  currency: Bytes
+}
+
+type BidOrder @entity {
+  id: ID!
+  bidId: BigInt!
+  saleId: BigInt!
+  sellerAddress: Bytes!
+  buyerAddress: Bytes!
+  price: BigInt!
+  withdrawn: Boolean!
+}
+
+type Swap @entity {
+  id: ID!
+  swapId: BigInt!
+  initiatorNFTAddress: Bytes!
+  initiator: Bytes!
+  initiatorNftId: BigInt!
+  requestedTokenOwner: Bytes!
+  requestedTokenId: BigInt!
+  requestedTokenAddress: Bytes!
+  status: Boolean!
+}
+
+
+type PoolDetail @entity {
+  id: ID! # Use the poolId as the ID
+  owner: Bytes!
+  poolAddress: Bytes!
+}
+
+type PoolCreated @entity {
+  id: ID!
+  owner: Bytes!
+  poolAddress: Bytes!
+  poolId: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SetPaymentCycleDuration @entity {
+  id: ID!
+  poolId: BigInt!
+  duration: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SetPaymentDefaultDuration @entity {
+  id: ID!
+  poolId: BigInt!
+  duration: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SetPoolFee @entity {
+  id: ID!
+  poolId: BigInt!
+  feePct: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SetLoanExpirationTime @entity {
+  id: ID!
+  poolId: BigInt!
+  duration: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SetPoolURI @entity {
+  id: ID!
+  poolId: BigInt!
+  uri: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SetAPR @entity {
+  id: ID!
+  poolId: BigInt!
+  APR: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type PoolClosed @entity {
+  id: ID!
+  poolId: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type SuppliedToPool @entity {
+  id: ID!
+  lender: Bytes!
+  poolId: BigInt!
+  bidId: BigInt!
+  erc20Token: Bytes!
+  tokenAmount: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type BidAccepted @entity {
+  id: ID!
+  lender: Bytes!
+  receiver: Bytes!
+  bidId: BigInt!
+  poolId: BigInt!
+  amount: BigInt!
+  paymentCycleAmount: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type BidRejected @entity {
+  id: ID!
+  lender: Bytes!
+  bidId: BigInt!
+  poolId: BigInt!
+  amount: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type BidRepaid @entity {
+  id: ID!
+  bidId: BigInt!
+  paidAmount: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type InstallmentRepaid @entity {
+  id: ID!
+  poolId: BigInt!
+  bidId: BigInt!
+  owedAmount: BigInt!
+  dueAmount: BigInt!
+  interest: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type FullAmountRepaid @entity {
+  id: ID!
+  poolId: BigInt!
+  bidId: BigInt!
+  amount: BigInt!
+  interest: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Withdrawn @entity {
+  id: ID!
+  receiver: Bytes!
+  bidId: BigInt!
+  poolId: BigInt!
+  amount: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type Loan @entity {
+  id: ID! # Use loanId as the ID
+  borrower: Bytes!
+  receiver: Bytes!
+  poolId: BigInt!
+  paymentCycleAmount: BigInt!
+  loanState: String! # PENDING, ACCEPTED, PAID
+  totalRepaidPrincipal: BigInt!
+  totalRepaidInterest: BigInt!
+  lastRepaidTimestamp: BigInt
+}
+
+type BorrowerLoan @entity {
+  id: ID! # Use combination of borrower address and loanId
+  borrower: Bytes!
+  loanId: BigInt!
+}
+type ValidatedNFTToken @entity {
+  id: ID! # Unique identifier, corresponds to the tokenId
+  uri: String! # Metadata URI for the token
+  owner: Bytes! # Owner of the token
+  createdAt: BigInt! # Timestamp when the token was minted
+  royalties: [ValidatorRoyalties!]! @derivedFrom(field: "token")
+}
+
+type ValidatorRoyalties @entity {
+  id: ID! # Unique identifier, corresponds to the tokenId
+  token: ValidatedNFTToken! # Relationship to the ValidatedNFTToken
+  addresses: [Bytes!]! # List of recipient addresses
+  values: [BigInt!]! # List of royalty percentages
+  updatedAt: BigInt! # Timestamp of last update
+}
+type NFTDetail @entity {
+  id: ID!
+  tokenId: BigInt!
+  tokenOwner: Bytes!
+  contractAddress: Bytes!
+  duration: Int!
+  expiration: BigInt!
+  expectedAmount: BigInt!
+  percent: Int!
+  listed: Boolean!
+  bidAccepted: Boolean!
+  repaid: Boolean!
+}
+
+type BidDetail @entity {
+  id: ID!
+  nftId: BigInt!
+  bidId: BigInt!
+  percent: Int!
+  duration: Int!
+  expiration: BigInt!
+  bidderAddress: Bytes!
+  ERC20Address: Bytes!
+  amount: BigInt!
+  acceptedTimestamp: BigInt!
+  protocolFee: Int!
+  withdrawn: Boolean!
+  bidAccepted: Boolean!
+}
+
+type AppliedBid @entity {
+  id: ID!
+  nftId: BigInt!
+  bidId: BigInt!
+  tokenId: BigInt!
+  contractAddress: Bytes!
+  bidAmount: BigInt!
+  apy: Int!
+  duration: Int!
+  expiration: BigInt!
+  ERC20Address: Bytes!
+}
+
+type RepaidEvent @entity {
+  id: ID!
+  nftId: BigInt!
+  bidId: BigInt!
+  amount: BigInt!
+  contractAddress: Bytes!
+}
+
+type AcceptedBidEvent @entity {
+  id: ID!
+  nftId: BigInt!
+  bidId: BigInt!
+  amount: BigInt!
+  protocolAmount: BigInt!
+  contractAddress: Bytes!
+}
+
+type WithdrawnEvent @entity {
+  id: ID!
+  nftId: BigInt!
+  bidId: BigInt!
+  amount: BigInt!
+}
+
+type BidRejectedEvent @entity {
+  id: ID!
+  nftId: BigInt!
+  bidId: BigInt!
+  receiverAddress: Bytes!
+  amount: BigInt!
+}
+
+type NFTRemovedEvent @entity {
+  id: ID!
+  nftId: BigInt!
+  contractAddress: Bytes!
+}
+
